@@ -19,7 +19,7 @@ export default function App() {
     const weeksLived = Math.floor((today - birthDate) / msInWeek);
     
     // Assuming average lifespan of ~90 years (4160 weeks)
-    const totalWeeks = 52*90;// 90 years * 52 weeks per year
+    const totalWeeks = Math.max(52*90, Math.round(weeksLived*1.3));// 90 years * 52 weeks per year
     const weeksRemaining = totalWeeks - weeksLived;
     const percentageLived = Math.round((weeksLived / totalWeeks) * 100);
     
@@ -35,8 +35,8 @@ export default function App() {
 
     // Calculate cups of coffee consumed (assuming 1 cup per day starting at age 18)
     const coffeeStartAge = 18; // Starting age for coffee consumption
-    const coffeeDays = Math.floor(Math.max(0, daysLived - (coffeeStartAge * 365.25))); // Adjust for leap years
-    const coffeeCups = Math.floor(coffeeDays / 7); // Assuming 1 cup per week
+    const coffeeCups = Math.floor(Math.max(0, daysLived - (coffeeStartAge * 365.25))); // Adjust for leap years
+    
     
     // Calculate breaths (average 16 breaths per minute)
     const breaths = Math.floor(daysLived * 24 * 60 * 16);
@@ -73,7 +73,7 @@ export default function App() {
   
   const rows = [];
   const weeksPerRow = 52; // One age year per row
-  const totalYears = 90; // Changed to match your 90-year lifespan
+  const totalYears = Math.round(stats.totalWeeks/52); // Changed to match your 90-year lifespan
   
   const birthDate = new Date(birthdate);
   const today = new Date();
@@ -171,7 +171,7 @@ export default function App() {
     <div className="section">
       <h2>Your life in weeks</h2>
       <div className="debug-info">
-        Current age: {currentAge} years, Week {weeksIntoCurrentAge + 1} of age {currentAge}
+        Current age: {currentAge} years, Week {weeksIntoCurrentAge + 1} of age {currentAge}.
       </div>
       <div className="week-grid">
         {rows}
