@@ -1,4 +1,4 @@
-// src/App.js - Fixed Version (No Flash)
+// src/App.js - Mobile Optimized Version
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
@@ -9,9 +9,23 @@ export default function App() {
   const [showHoverData, setShowHoverData] = useState(false);
   const [hoverWeek, setHoverWeek] = useState(null);
   const [animeLoaded, setAnimeLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const weekGridRef = useRef(null);
   const statsRef = useRef(null);
   const formRef = useRef(null);
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth <= 768 || 
+                           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileDevice);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Load Anime.js from CDN
   useEffect(() => {
@@ -25,8 +39,8 @@ export default function App() {
     script.onload = () => {
       setAnimeLoaded(true);
       
-      // Test anime immediately after loading
-      if (window.anime) {
+      // Test anime immediately after loading (only on desktop)
+      if (window.anime && !isMobile) {
         window.anime({
           targets: 'h1',
           scale: [1, 1.02, 1],
@@ -39,7 +53,7 @@ export default function App() {
       console.error('Failed to load Anime.js');
     };
     document.head.appendChild(script);
-  }, []);
+  }, [isMobile]);
 
   const calculateStats = (date) => {
     const birthDate = new Date(date);
@@ -61,10 +75,8 @@ export default function App() {
 
     const coffeeStartAge = 18;
     const coffeeCupsPerDay = 2; // Average coffee cups per day
-    const coffeeCups = Math.floor(Math.max(0, daysLived - (coffeeStartAge * 365.25)))* coffeeCupsPerDay;
+    const coffeeCups = Math.floor(Math.max(0, daysLived - (coffeeStartAge * 365.25))) * coffeeCupsPerDay;
 
-
-    
     const breaths = Math.floor(daysLived * 24 * 60 * 16);
     const seasons = Math.floor(daysLived / 91.25);
     
@@ -84,7 +96,7 @@ export default function App() {
   };
 
   const animateStepTransition = () => {
-    if (!window.anime) {
+    if (!window.anime || !animeLoaded) {
       setStep(2);
       return;
     }
@@ -94,20 +106,25 @@ export default function App() {
       return;
     }
     
+    // Mobile: Faster, simpler transition
+    const duration = isMobile ? 250 : 500;
+    const translateY = isMobile ? -20 : -50;
+    
     // Fade out form
     window.anime({
       targets: formRef.current,
       opacity: 0,
-      translateY: -50,
-      duration: 500,
+      translateY: translateY,
+      duration: duration,
       easing: 'easeInQuart',
       complete: () => {
         setStep(2);
-        // Small delay before showing new content
+        // Shorter delay for mobile
+        const delay = isMobile ? 50 : 200;
         setTimeout(() => {
           animateWeekGrid();
           animateStats();
-        }, 200);
+        }, delay);
       }
     });
   };
@@ -115,82 +132,146 @@ export default function App() {
   const animateWeekGrid = () => {
     if (!window.anime || !weekGridRef.current) return;
 
-    // Animate title first
-    const title = weekGridRef.current.querySelector('h2');
-    if (title) {
-      window.anime({
-        targets: title,
-        opacity: [0, 1],
-        translateY: [30, 0],
-        duration: 600,
-        easing: 'easeOutQuart'
-      });
-    }
+    if (isMobile) {
+      // Mobile: Simple, fast animations
+      const title = weekGridRef.current.querySelector('h2');
+      if (title) {
+        window.anime({
+          targets: title,
+          opacity: [0, 1],
+          duration: 200,
+          easing: 'easeOutQuart'
+        });
+      }
 
-    // Animate week cells - CSS already has them hidden
-    const weekCells = weekGridRef.current.querySelectorAll('.week-cell');
-    
-    if (weekCells.length > 0) {
-      window.anime({
-        targets: weekCells,
-        opacity: [0, 1],
-        scale: [0.3, 1],
-        duration: 800,
-        delay: window.anime.stagger(2, {start: 300}),
-        easing: 'easeOutElastic(1, .8)',
-      });
-    }
+      // Animate all week cells at once (no stagger)
+      const weekCells = weekGridRef.current.querySelectorAll('.week-cell');
+      if (weekCells.length > 0) {
+        window.anime({
+          targets: weekCells,
+          opacity: [0, 1],
+          scale: [0.8, 1],
+          duration: 300,
+          delay: 100,
+          easing: 'easeOutQuart',
+        });
+      }
 
-    // Animate year labels - CSS already has them hidden
-    const yearLabels = weekGridRef.current.querySelectorAll('.year-label');
-    
-    if (yearLabels.length > 0) {
-      window.anime({
-        targets: yearLabels,
-        opacity: [0, 1],
-        translateX: [-30, 0],
-        duration: 600,
-        delay: window.anime.stagger(50, {start: 800}),
-        easing: 'easeOutQuart'
-      });
-    }
+      // Animate year labels quickly
+      const yearLabels = weekGridRef.current.querySelectorAll('.year-label');
+      if (yearLabels.length > 0) {
+        window.anime({
+          targets: yearLabels,
+          opacity: [0, 1],
+          duration: 200,
+          delay: 150,
+          easing: 'easeOutQuart'
+        });
+      }
 
-    // Animate legend - CSS already has it hidden
-    const legend = weekGridRef.current.querySelector('.legend');
-    if (legend) {
-      setTimeout(() => {
+      // Animate legend
+      const legend = weekGridRef.current.querySelector('.legend');
+      if (legend) {
         window.anime({
           targets: legend,
           opacity: [0, 1],
-          translateY: [20, 0],
-          duration: 500,
+          duration: 200,
+          delay: 200,
           easing: 'easeOutQuart'
         });
-      }, 1500);
+      }
+    } else {
+      // Desktop: Full animations (your original code)
+      const title = weekGridRef.current.querySelector('h2');
+      if (title) {
+        window.anime({
+          targets: title,
+          opacity: [0, 1],
+          translateY: [30, 0],
+          duration: 600,
+          easing: 'easeOutQuart'
+        });
+      }
+
+      const weekCells = weekGridRef.current.querySelectorAll('.week-cell');
+      if (weekCells.length > 0) {
+        window.anime({
+          targets: weekCells,
+          opacity: [0, 1],
+          scale: [0.3, 1],
+          duration: 800,
+          delay: window.anime.stagger(2, {start: 300}),
+          easing: 'easeOutElastic(1, .8)',
+        });
+      }
+
+      const yearLabels = weekGridRef.current.querySelectorAll('.year-label');
+      if (yearLabels.length > 0) {
+        window.anime({
+          targets: yearLabels,
+          opacity: [0, 1],
+          translateX: [-30, 0],
+          duration: 600,
+          delay: window.anime.stagger(50, {start: 800}),
+          easing: 'easeOutQuart'
+        });
+      }
+
+      const legend = weekGridRef.current.querySelector('.legend');
+      if (legend) {
+        setTimeout(() => {
+          window.anime({
+            targets: legend,
+            opacity: [0, 1],
+            translateY: [20, 0],
+            duration: 500,
+            easing: 'easeOutQuart'
+          });
+        }, 1500);
+      }
     }
   };
 
   const animateStats = () => {
     if (!window.anime || !statsRef.current) return;
 
-    // Animate each section - CSS already has them hidden
-    const sections = statsRef.current.querySelectorAll('.section');
-    
-    if (sections.length > 0) {
-      window.anime({
-        targets: sections,
-        opacity: [0, 1],
-        translateY: [50, 0],
-        duration: 800,
-        delay: window.anime.stagger(200, {start: 1000}),
-        easing: 'easeOutQuart'
-      });
-    }
+    if (isMobile) {
+      // Mobile: Simple, fast animations
+      const sections = statsRef.current.querySelectorAll('.section');
+      
+      if (sections.length > 0) {
+        window.anime({
+          targets: sections,
+          opacity: [0, 1],
+          duration: 300,
+          delay: 300,
+          easing: 'easeOutQuart'
+        });
+      }
 
-    // Animate numbers with counting effect
-    setTimeout(() => {
-      animateNumbers();
-    }, 1500);
+      // Quick number animation for mobile
+      setTimeout(() => {
+        animateNumbers();
+      }, 500);
+    } else {
+      // Desktop: Full animations (your original code)
+      const sections = statsRef.current.querySelectorAll('.section');
+      
+      if (sections.length > 0) {
+        window.anime({
+          targets: sections,
+          opacity: [0, 1],
+          translateY: [50, 0],
+          duration: 800,
+          delay: window.anime.stagger(200, {start: 1000}),
+          easing: 'easeOutQuart'
+        });
+      }
+
+      setTimeout(() => {
+        animateNumbers();
+      }, 1500);
+    }
   };
 
   const animateNumbers = () => {
@@ -207,24 +288,29 @@ export default function App() {
     numbersToAnimate.forEach((item, index) => {
       const element = document.querySelector(item.selector);
       if (element) {
+        // Mobile: Faster counting
+        const duration = isMobile ? 600 : 1500;
+        const delay = isMobile ? index * 30 : index * 100;
+        
         setTimeout(() => {
           const obj = { value: 0 };
           window.anime({
             targets: obj,
             value: item.value,
-            duration: 1500,
+            duration: duration,
             easing: 'easeOutQuart',
             update: () => {
               element.textContent = new Intl.NumberFormat().format(Math.floor(obj.value));
             }
           });
-        }, index * 100);
+        }, delay);
       }
     });
   };
 
   const animateWeekHover = (element) => {
-    if (!window.anime) return;
+    // Disable hover animations on mobile for performance
+    if (!window.anime || isMobile) return;
     
     window.anime({
       targets: element,
@@ -235,7 +321,8 @@ export default function App() {
   };
 
   const animateWeekUnhover = (element) => {
-    if (!window.anime) return;
+    // Disable hover animations on mobile for performance
+    if (!window.anime || isMobile) return;
     
     window.anime({
       targets: element,
@@ -246,8 +333,7 @@ export default function App() {
   };
 
   const handleSubmit = () => {
-    if (!birthdate) return; // 👈 NEW LINE - prevents submission without date
-
+    if (!birthdate) return;
     
     const calculatedStats = calculateStats(birthdate);
     setStats(calculatedStats);
@@ -263,7 +349,7 @@ export default function App() {
     if (e.key === 'Enter') {
       handleSubmit();
     }
-  }
+  };
 
   const getFormattedNumber = (num) => {
     return new Intl.NumberFormat().format(num);
@@ -391,10 +477,6 @@ export default function App() {
             <div className="legend-color week-past"></div>
             <span>Past</span>
           </div>
-{/*           <div className="legend-item">
-            <div className="legend-color week-recent"></div>
-            <span>Recent</span>
-          </div> */}
           <div className="legend-item">
             <div className="legend-color week-current"></div>
             <span>Present</span>
@@ -471,12 +553,14 @@ export default function App() {
 
   const handleReset = () => {
     if (window.anime && (weekGridRef.current || statsRef.current)) {
-      // Animate out current content
+      // Mobile: Faster reset
+      const duration = isMobile ? 250 : 500;
+      
       window.anime({
         targets: [weekGridRef.current, statsRef.current].filter(Boolean),
         opacity: 0,
-        translateY: 50,
-        duration: 500,
+        translateY: isMobile ? 20 : 50,
+        duration: duration,
         easing: 'easeInQuart',
         complete: () => {
           setBirthdate('');
@@ -487,17 +571,17 @@ export default function App() {
           setTimeout(() => {
             if (formRef.current) {
               formRef.current.style.opacity = '0';
-              formRef.current.style.transform = 'translateY(50px)';
+              formRef.current.style.transform = `translateY(${isMobile ? 20 : 50}px)`;
               
               window.anime({
                 targets: formRef.current,
                 opacity: [0, 1],
-                translateY: [50, 0],
-                duration: 600,
+                translateY: [isMobile ? 20 : 50, 0],
+                duration: isMobile ? 300 : 600,
                 easing: 'easeOutQuart'
               });
             }
-          }, 100);
+          }, isMobile ? 50 : 100);
         }
       });
     } else {
@@ -511,17 +595,17 @@ export default function App() {
   useEffect(() => {
     if (step === 1 && formRef.current && window.anime && animeLoaded) {
       formRef.current.style.opacity = '0';
-      formRef.current.style.transform = 'translateY(30px)';
+      formRef.current.style.transform = `translateY(${isMobile ? 20 : 30}px)`;
       
       window.anime({
         targets: formRef.current,
         opacity: [0, 1],
-        translateY: [30, 0],
-        duration: 800,
+        translateY: [isMobile ? 20 : 30, 0],
+        duration: isMobile ? 400 : 800,
         easing: 'easeOutQuart'
       });
     }
-  }, [step, animeLoaded]);
+  }, [step, animeLoaded, isMobile]);
 
   return (
     <div className="app">
@@ -529,7 +613,7 @@ export default function App() {
         <h1>Life in weeks {animeLoaded ? '✨' : '⏳'}</h1>
         <p className="subtitle">
           A simple visualization to reflect on the passage of time
-          {animeLoaded ? '' : ' (Loading animations...)'}
+          {animeLoaded ? (isMobile ? ' (Mobile optimized)' : '') : ' (Loading animations...)'}
         </p>
         
         {step === 1 ? (
@@ -541,7 +625,7 @@ export default function App() {
                 className="date-input"
                 value={birthdate}
                 onChange={(e) => setBirthdate(e.target.value)}
-                onKeyUp={handleKeyPress}  // 👈 NEW LINE - handles Enter key
+                onKeyUp={handleKeyPress}
                 required
               />
               <button

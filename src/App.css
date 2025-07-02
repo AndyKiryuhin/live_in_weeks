@@ -280,10 +280,12 @@ h1 {
 .debug-info {
   font-size: 14px;
   color: #6b7280;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  margin-top: 24px;
   padding: 8px;
   background-color: #f3f4f6;
   border-radius: 4px;
+  text-align: center;
 }
 
 /* Stats with animation support */
@@ -394,6 +396,19 @@ h1 {
   
   .legend {
     gap: 12px;
+  }
+  
+  /* Fix mobile spacing issues */
+  .section h2 {
+    margin-bottom: 24px;
+    margin-top: 0;
+  }
+  
+  .debug-info {
+    font-size: 12px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+    line-height: 1.4;
   }
 }
 
