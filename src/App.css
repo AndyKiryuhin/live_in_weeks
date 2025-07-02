@@ -144,8 +144,8 @@ h1 {
 
 .week-grid-title,
 .section h2 {
-  opacity: 0;
-  transform: translateY(30px);
+  opacity: 100;
+  
 }
 
 .stats-container .section {
@@ -378,9 +378,9 @@ h1 {
   }
   
   .year-label {
-    width: 20px;
+    width: 0px;
     font-size: 10px;
-    margin-right: 6px;
+    margin-right: 0px;
   }
   
   .container {
