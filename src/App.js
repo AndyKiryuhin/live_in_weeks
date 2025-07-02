@@ -613,7 +613,7 @@ export default function App() {
         <h1>Life in weeks {animeLoaded ? '✨' : '⏳'}</h1>
         <p className="subtitle">
           A simple visualization to reflect on the passage of time
-          {animeLoaded ? (isMobile ? ' (Mobile optimized)' : '') : ' (Loading animations...)'}
+          {animeLoaded ? (isMobile ? ' ' : '') : ' (Loading animations...)'}
         </p>
         
         {step === 1 ? (

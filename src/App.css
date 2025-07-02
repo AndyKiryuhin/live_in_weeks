@@ -123,7 +123,8 @@ h1 {
   margin-top: 32px;
   align-items: center;
   width: 100%;
-  padding: 0 16px;
+  padding: 0 50px;
+  position: relative;
 }
 
 /* Hide elements initially for smooth animation entrance */
@@ -145,7 +146,7 @@ h1 {
 .week-grid-title,
 .section h2 {
   opacity: 100;
-  
+
 }
 
 .stats-container .section {
@@ -157,17 +158,19 @@ h1 {
   display: flex;
   align-items: center;
   margin-bottom: 1px;
-  justify-content: flex-start;
+  justify-content: center;
   width: 100%;
   max-width: 600px;
+  position: relative;
 }
 
 .year-label {
-  width: 25px;
+  position: absolute;
+  left: 0px;
+  width: 30px;
   font-size: 12px;
   color: #6b7280;
-  text-align: center;
-  margin-right: 8px;
+  text-align: right;
   flex-shrink: 0;
   /* Animation optimization */
   will-change: transform, opacity;
@@ -175,6 +178,7 @@ h1 {
 
 .week-row {
   display: flex;
+  justify-content: center;
 }
 
 /* Week cell base styles - visible in step 1, hidden in step 2 until animated */
@@ -355,8 +359,13 @@ h1 {
   }
   
   .year-label {
-    width: 0px;
+    left: 0px;
+    width: 25px;
     font-size: 11px;
+  }
+  
+  .week-grid {
+    padding: 0 40px;
   }
   
   .container {
@@ -378,9 +387,13 @@ h1 {
   }
   
   .year-label {
-    width: 0px;
+    left: 0px;
+    width: 20px;
     font-size: 10px;
-    margin-right: 0px;
+  }
+  
+  .week-grid {
+    padding: 0 35px;
   }
   
   .container {
@@ -389,7 +402,7 @@ h1 {
   
   .year-row {
     max-width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
   }
   
   h1 {
@@ -423,9 +436,13 @@ h1 {
   }
   
   .year-label {
+    left: 0px;
     width: 18px;
     font-size: 9px;
-    margin-right: 4px;
+  }
+  
+  .week-grid {
+    padding: 0 30px;
   }
   
   .app {
@@ -435,5 +452,109 @@ h1 {
   
   .section {
     padding: 16px;
+  }
+}
+
+/* Small mobile devices (iPhone SE, etc.) - 375px */
+@media (max-width: 375px) {
+  .week-grid {
+    max-width: 300px;
+    margin: 16px auto;
+    padding: 0 25px;
+  }
+  
+  .week-cell {
+    width: 4px;
+    height: 4px;
+    margin: 0.25px;
+  }
+  
+  .year-label {
+    left: 0px;
+    width: 16px;
+    font-size: 8px;
+  }
+  
+  .section {
+    padding: 12px;
+  }
+  
+  .app {
+    padding: 12px;
+    padding-top: 24px;
+  }
+  
+  .container {
+    padding: 0 6px;
+  }
+  
+  h1 {
+    font-size: 18px;
+  }
+  
+  .debug-info {
+    font-size: 11px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 6px;
+  }
+}
+
+/* Extra small devices - 320px */
+@media (max-width: 320px) {
+  .week-grid {
+    max-width: 280px;
+    margin: 12px auto;
+    padding: 0 20px;
+  }
+  
+  .week-cell {
+    width: 3.5px;
+    height: 3.5px;
+    margin: 0.2px;
+  }
+  
+  .year-label {
+    left: 20px;
+    width: 14px;
+    font-size: 7px;
+  }
+  
+  .section {
+    padding: 10px;
+  }
+  
+  .app {
+    padding: 8px;
+    padding-top: 20px;
+  }
+  
+  .container {
+    padding: 0 4px;
+  }
+  
+  h1 {
+    font-size: 16px;
+  }
+  
+  .section h2 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .debug-info {
+    font-size: 10px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding: 4px;
+  }
+  
+  .legend {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .legend-item {
+    font-size: 12px;
   }
 }
